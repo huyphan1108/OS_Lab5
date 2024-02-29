@@ -1,0 +1,295 @@
+#include <stdio.h>
+
+#include <stdlib.h>
+
+#include <string.h>
+
+// main method definition
+
+int main()
+
+{
+
+int r;
+
+int row, col, count = 0;
+
+// Accepts number of process from the user and converts it into integer
+
+int numberOfProcess;
+
+printf("\n Enter Number Of Process: ");
+
+scanf("%d", &numberOfProcess);
+
+// Accepts number of resources from the user and converts it into integer
+
+int numberOfResources;
+
+printf("\n Enter Number Of Resource: ");
+
+scanf("%d", &numberOfResources);
+
+// Creates an array to store available resources
+
+int *availableResource = (int *) malloc(sizeof(int) * numberOfResources);
+
+// Creates an matrix of size numberOfProcess X numberOfResources
+
+// to store maximum resources of each type
+
+int **maximumResource = (int **) malloc(sizeof(int) * numberOfProcess);
+
+for(r = 0; r < numberOfProcess; r++)
+
+maximumResource[r] = (int *) malloc(sizeof(int) * numberOfResources);
+
+// Creates an matrix of size numberOfProcess X numberOfResources
+
+// to store allocated resources of each type
+
+int **allocationResource = (int **) malloc(sizeof(int) * numberOfProcess);
+
+for(r = 0; r < numberOfProcess; r++)
+
+allocationResource[r] = (int *) malloc(sizeof(int) * numberOfResources);
+
+// Creates an matrix of size numberOfProcess X numberOfResources
+
+// to store calculated need resources of each type
+
+int **needResource = (int **) malloc(sizeof(int) * numberOfProcess);
+
+for(r = 0; r < numberOfProcess; r++)
+
+needResource[r] = (int *) malloc(sizeof(int) * numberOfResources);
+
+// To store safe process sequence
+
+int processSequence[numberOfProcess];
+
+// Loops till number of resources
+
+for(row = 0; row < numberOfResources; row++)
+
+{
+
+printf("\n Number Of Available Resource %d: ", (row + 1));
+
+scanf("%d", &availableResource[row]);
+
+}
+
+// Loops till number of processes
+
+for(row = 0; row < numberOfProcess; row++)
+
+{
+
+// Loops till number of resources
+
+for(col = 0; col < numberOfResources; col++)
+
+{
+
+printf("\n Allocation P %d for R %d: ", (row + 1), (col + 1));
+
+scanf("%d", &allocationResource[row][col]);
+
+}
+
+}// End of for loop
+
+// Loops till number of processes
+
+for(row = 0; row < numberOfProcess; row++)
+
+{
+
+// Loops till number of resources
+
+for(col = 0; col < numberOfResources; col++)
+
+{
+
+printf("\n MAX P %d for R %d: ", (row + 1), (col + 1));
+
+scanf("%d", &maximumResource[row][col]);
+
+needResource[row][col] = maximumResource[row][col] - allocationResource[row][col];
+
+}// End of for loop for resources
+
+}// End of for loop for process
+
+printf("\n Available Resources: ");
+
+// Loops till number of resources
+
+for(row = 0; row < numberOfResources; row++)
+
+printf("%4d", availableResource[row]);
+
+printf("\n Allocation \t MAX \t\t\t Need\n");
+
+// Loops till number of processes
+
+for(row = 0; row < numberOfProcess; row++)
+
+{
+
+printf("P%d",(row + 1));
+
+// Loops till number of resources
+
+for(col = 0; col < numberOfResources; col++)
+
+printf("%4d", allocationResource[row][col]);
+
+printf("\t\t");
+
+// Loops till number of resources
+
+for(col = 0; col < numberOfResources; col++)
+
+printf("%4d", maximumResource[row][col]);
+
+printf("\t\t");
+
+// Loops till number of resources
+
+for(col = 0; col < numberOfResources; col++)
+
+printf("%4d", needResource[row][col]);
+
+printf("\n");
+
+}// End of for loop
+
+// Creates an array of size availableResource
+
+int *work = (int *) malloc(sizeof(int) * numberOfResources);
+
+// Loops till number of resources
+
+for(row = 0; row < numberOfResources; row++)
+
+work[row] = availableResource[row];
+
+// Creates an array of size numberOfProcess to store process finish status
+
+int *finish = (int *) malloc(sizeof(int) * numberOfProcess);
+
+// Loops till number of processes assigns false to each index of finish for not finished process
+
+for(row = 0; row < numberOfProcess; row++)
+
+finish[row] = 0;
+
+// Initially checking is status is true
+
+int checking = 1;
+
+// Loops till checking status is true for working
+
+while(checking)
+
+{
+
+// Sets the checking status to false for not finished
+
+checking = 0;
+
+// Loops till number of processes
+
+for(row = 0; row < numberOfProcess; row++)
+
+{
+
+// Checks if the current row index of the finish array is not false
+
+if(!finish[row])
+
+{
+
+int col;
+
+// Loops till number of resources
+
+for(col = 0; col < numberOfResources; col++)
+
+// Checks if current row and col index of needResource matrix value
+
+// is greater than the work array col index value
+
+if(needResource[row][col] > work[col])
+
+// Come out of the loop
+
+break;
+
+// Checks if col index value is equals to number of resources
+
+if(col == numberOfResources)
+
+{
+
+// Loops till number of resources
+
+for(col = 0; col < numberOfResources; col++)
+
+// Adds allocated matrix row and col index value with work array col index value
+
+// and assigns it at col index of work array
+
+work[col] = work[col] + allocationResource[row][col];
+
+// Sets the row index of finish array to true for finish process
+
+finish[row] = 1;
+
+// Sets the checking status to true
+
+checking = 1;
+
+// Adds the row number as process number to finish process sequence
+
+processSequence[count++] = row;
+
+}// End of inner if condition
+
+}// End of outer if condition
+
+}// End of for loop for process
+
+}// End of while loop
+
+int counter;
+
+// Loops till number of processes
+
+for(counter = 0; counter < numberOfProcess; counter++)
+
+// Checks if counter index of the finish array is not finish (false) then come out of the loop
+
+if(!finish[counter])
+
+break;
+
+printf("\n SAFE And Sequence is \n");
+
+// Checks if counter value is equals to number of process than display safe sequence
+
+if(counter == numberOfProcess)
+
+for(r = 0; r < count; r++)
+
+printf(" Process: %d\n", processSequence[r]);
+
+// Otherwise displays dead lock
+
+else
+
+printf("\n DEAD LOCK");
+
+}// End of main method
